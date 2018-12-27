@@ -21,9 +21,9 @@
 
 .color-search-button {
   background-color: #4CAF50;
-  border: none;
+  border:1px solid #AAAAAA;
   border-radius:25px;
-  color: white;;
+  color:black;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;

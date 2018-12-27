@@ -22,9 +22,6 @@ if(queryHasRGBColor || queryHasHexColor){
 
   var hexColor = queryHasHexColor ? HEX_COLOR_REGEX.exec(query)[0] : rgbToHex(RGB_COLOR_REGEX.exec(query)[0]);
   var rgbColor = queryHasRGBColor ? RGB_COLOR_REGEX.exec(query)[0] : hexToRgb(HEX_COLOR_REGEX.exec(query)[0]);
-  console.log(RGB_COLOR_REGEX.exec(query)[0]);
-  console.log(hexColor);
-  console.log(rgbColor);
 
   injectColorCard(hexColor,rgbColor);
 
@@ -60,21 +57,36 @@ function injectColorCard(hexColor, rgbColor, size = 200){
       var ctx = colorWheel.getContext("2d");
       var data = ctx.getImageData(evt.offsetX, evt.offsetY, 1, 1);
       console.log("RGB: " + data.data.slice(0, 3).join(','));
+      var rgb = 'rgb(' + data.data.slice(0, 3).join(',') + ')';
+      injectColorCard(rgbToHex(rgb),rgb);
   }
 
   colorWheel.onclick = colorWheelMouse;
+
+  // Text on button to contrast background-color
+  var rgb = rgbColor.match(/rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
+  var o = Math.round(((parseInt(rgb[1]) * 299) +
+                    (parseInt(rgb[2]) * 587) +
+                    (parseInt(rgb[3]) * 114)) / 1000);
+  var btnTextColor = (o > 125) ? 'black' : 'white';
 
   // Create card
   var templateData = {
     hex: hexColor,
     rgb: rgbColor,
+    btnTextColor: btnTextColor,
     name: 'White Fuschia'
   };
   var card = createCard(templateData);
 
   // Add card to the DOM
-  var parent = document.getElementsByClassName('bkWMgd')[0].parentElement
-  parent.insertBefore(card, parent.firstChild);
+  var parent = document.getElementsByClassName('bkWMgd')[0].parentElement;
+  if(document.getElementsByClassName('color-search-card')[0]){
+    document.getElementsByClassName('color-search-card')[0].replaceWith(card);
+  }
+  else{
+    parent.insertBefore(card, parent.firstChild);
+  }
   document.getElementById('color-search-color-wheel').replaceWith(colorWheel);
 
 }
