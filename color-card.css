@@ -1,8 +1,7 @@
 
 
 .color-search-card {
-  border:1px solid #AAAAAA;
-  border-radius:5px;
+  border: none;
   padding:10px;
   margin-bottom:20px;
   height:200px;
@@ -16,25 +15,49 @@
   height:100%;
   text-align:center;
   width:50%;
-  color: #444444;
-}
-
-.color-search-button {
-  background-color: #4CAF50;
-  border:1px solid #AAAAAA;
-  border-radius:25px;
-  color:black;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  -webkit-transition-duration: 0.4s; /* Safari */
-  transition-duration: 0.4s;
+  border-radius: 15px;
 }
 
 .color-search-color-wheel {
   float: right;
+}
+
+.paperclip.icon {
+  position: absolute;
+  margin-left: 9px;
+  margin-top: 2px;
+  width: 6px;
+  height: 12px;
+  border-radius: 4px 4px 0 0;
+  border-left: solid 1px currentColor;
+  border-right: solid 1px currentColor;
+  border-top: solid 1px currentColor;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+  margin-left:20px;
+  cursor:pointer;
+}
+.paperclip.icon:before {
+  content: '';
+  position: absolute;
+  top: 11px;
+  left: -1px;
+  width: 4px;
+  height: 6px;
+  border-radius: 0 0 3px 3px;
+  border-left: solid 1px currentColor;
+  border-right: solid 1px currentColor;
+  border-bottom: solid 1px currentColor;
+}
+.paperclip.icon:after {
+  content: '';
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  width: 2px;
+  height: 10px;
+  border-radius: 4px 4px 0 0;
+  border-left: solid 1px currentColor;
+  border-right: solid 1px currentColor;
+  border-top: solid 1px currentColor;
 }

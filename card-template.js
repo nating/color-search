@@ -7,9 +7,9 @@ function createCard(data) {
     return template.content.firstChild;
 }
 
-function copyColor() {
+function copy(text) {
     var input = document.createElement('input');
-    input.setAttribute('value', document.getElementById('color-search-hex').innerHTML);
+    input.setAttribute('value', text);
     input.setAttribute('display', 'none');
     document.body.appendChild(input);
     input.select();
@@ -19,23 +19,18 @@ function copyColor() {
  }
 
 const cardTemplate = (data) => `
-  <div class="color-search-card">
-    <div class="color-search-color-info">
+  <div class="color-search-card" style="color:${data.textColor};">
+    <div class="color-search-color-info" style="background-color:${data.hex};">
       <div>
-        <h3 id="color-search-hex">${data.hex}</h3>
+        <h3><span id="color-search-hex">${data.hex}</span><span onclick="copy('${data.hex}');" class="paperclip icon"></span></h3>
       </div>
       <div>
-        <h3 id="color-search-rgb">${data.rgb}</h3>
+        <h3><span id="color-search-rgb">${data.rgb}</span><span onclick="copy('${data.rgb}');" class="paperclip icon"></span></h3>
       </div>
       <div>
-        <h3 id="color-search-name">${data.name}</h3>
-      </div>
-      <div>
-      <button class="color-search-button" onclick="copyColor();" style="color:${data.btnTextColor};background-color:${data.hex}">
-        Copy to Clipboard
-      </button>
+        <h3><span id="color-search-name">${data.name}</span><span onclick="copy('${data.name}');" class="paperclip icon"></span></h3>
       </div>
     </div>
-    <div id="color-search-color-wheel" onclick="copyColor();" class="color-search-color-wheel">.
+    <div id="color-search-color-wheel" onclick="console.log('wheel clicked')" class="color-search-color-wheel">.
   </div>
 `;

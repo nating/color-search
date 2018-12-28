@@ -20,7 +20,7 @@ var queryHasHexColor = HEX_COLOR_REGEX.test(query);
 
 if(queryHasRGBColor || queryHasHexColor){
 
-  var hexColor = queryHasHexColor ? HEX_COLOR_REGEX.exec(query)[0] : rgbToHex(RGB_COLOR_REGEX.exec(query)[0]);
+  var hexColor = queryHasHexColor ? HEX_COLOR_REGEX.exec(query)[0].toUpperCase() : rgbToHex(RGB_COLOR_REGEX.exec(query)[0]);
   var rgbColor = queryHasRGBColor ? RGB_COLOR_REGEX.exec(query)[0] : hexToRgb(HEX_COLOR_REGEX.exec(query)[0]);
 
   injectColorCard(hexColor,rgbColor);
@@ -51,18 +51,6 @@ function hexToRgb(hex) {
 
 function injectColorCard(hexColor, rgbColor, size = 200){
 
-  var colorWheel = generateColorWheel(200);
-
-  function colorWheelMouse(evt) {
-      var ctx = colorWheel.getContext("2d");
-      var data = ctx.getImageData(evt.offsetX, evt.offsetY, 1, 1);
-      console.log("RGB: " + data.data.slice(0, 3).join(','));
-      var rgb = 'rgb(' + data.data.slice(0, 3).join(',') + ')';
-      injectColorCard(rgbToHex(rgb),rgb);
-  }
-
-  colorWheel.onclick = colorWheelMouse;
-
   // Text on button to contrast background-color
   var rgb = rgbColor.match(/rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
   var o = Math.round(((parseInt(rgb[1]) * 299) +
@@ -74,7 +62,7 @@ function injectColorCard(hexColor, rgbColor, size = 200){
   var templateData = {
     hex: hexColor,
     rgb: rgbColor,
-    btnTextColor: btnTextColor,
+    textColor: btnTextColor,
     name: 'White Fuschia'
   };
   var card = createCard(templateData);
@@ -87,6 +75,21 @@ function injectColorCard(hexColor, rgbColor, size = 200){
   else{
     parent.insertBefore(card, parent.firstChild);
   }
+
+  var colorWheel = generateColorWheel(size);
+
+  colorWheel = drawDotOnColorWheel(rgbColor,colorWheel,size);
+
+  function colorWheelMouse(evt) {
+      var ctx = colorWheel.getContext("2d");
+      var data = ctx.getImageData(evt.offsetX, evt.offsetY, 1, 1);
+      var rgb = 'rgb(' + data.data.slice(0, 3).join(',') + ')';
+      injectColorCard(rgbToHex(rgb),rgb);
+  }
+
+  colorWheel.onclick = colorWheelMouse;
+  colorWheel.setAttribute('id','color-search-color-wheel');
+
   document.getElementById('color-search-color-wheel').replaceWith(colorWheel);
 
 }
@@ -164,4 +167,27 @@ function generateColorWheel(size, centerColor) {
     }
     //return main canvas
     return canvas;
+}
+
+function drawDotOnColorWheel(rgbColor, colorWheel,size){
+
+  var context = colorWheel.getContext('2d');
+
+  for(var x=0;x<size;x++){
+    for(var y=0;y<size;y++){
+      var data = context.getImageData(x, y, 1, 1);
+      // If the pixel matches the color, then draw the dot
+      var pixelColor = 'rgb(' + data.data.slice(0, 3).join(',') + ')';
+      if(pixelColor === rgbColor){
+        context.beginPath();
+        context.arc(x, y, 5, 0, 2 * Math.PI, false);
+        context.fillStyle = 'white';
+        context.fill();
+        return colorWheel;
+      }
+    }
+  }
+
+  return colorWheel;
+
 }
