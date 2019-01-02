@@ -2,17 +2,15 @@
 
 main.js by Geoffrey Natin
 
-
 */
 
 //------------------- CONSTANTS -------------------
 
 const RGB_COLOR_REGEX = new RegExp('rgba?\\(\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*\\)');
 const HEX_COLOR_REGEX = new RegExp('#(?:[0-9a-fA-F]{3}){1,2}$');
+const COLOR_NAMES_URL = chrome.runtime.getURL('colornames.json');
 
 //--------------------- MAIN ----------------------
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
 
 var query = document.getElementsByName("q")[0].value;
 var queryHasRGBColor = RGB_COLOR_REGEX.test(query);
@@ -47,147 +45,65 @@ function hexToRgb(hex) {
 
 //------------------- CARD INJECTION -------------------
 
-// TODO: get color name from https://github.com/meodai/color-names using https://stackoverflow.com/questions/25107774/how-do-i-send-an-http-get-request-in-chrome-extension
-
 function injectColorCard(hexColor, rgbColor, size = 200){
 
-  // Text on button to contrast background-color
+  // Text color needs to contrast background-color
   var rgb = rgbColor.match(/rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
   var o = Math.round(((parseInt(rgb[1]) * 299) +
                     (parseInt(rgb[2]) * 587) +
                     (parseInt(rgb[3]) * 114)) / 1000);
   var btnTextColor = (o > 125) ? 'black' : 'white';
 
-  // Create card
-  var templateData = {
-    hex: hexColor,
-    rgb: rgbColor,
-    textColor: btnTextColor,
-    name: 'White Fuschia'
-  };
-  var card = createCard(templateData);
+  var colorName = '';
+  fetch(COLOR_NAMES_URL)
+      .then((response) => {return response.json()})
+      .then((colors) => {
+        for(i in colors){
+          var color = colors[i];
+          if(color.hex==hexColor.toLowerCase()){
 
-  // Add card to the DOM
-  var parent = document.getElementsByClassName('bkWMgd')[0].parentElement;
-  if(document.getElementsByClassName('color-search-card')[0]){
-    document.getElementsByClassName('color-search-card')[0].replaceWith(card);
-  }
-  else{
-    parent.insertBefore(card, parent.firstChild);
-  }
+            // Create card
+            var templateData = {
+              hex: hexColor,
+              rgb: rgbColor,
+              textColor: btnTextColor,
+              name: color.name
+            };
+            var card = createCard(templateData);
 
-  var colorWheel = generateColorWheel(size);
+            // Add card to the DOM
+            var parent = document.getElementsByClassName('bkWMgd')[0].parentElement;
+            if(document.getElementsByClassName('color-search-card')[0]){
+              document.getElementsByClassName('color-search-card')[0].replaceWith(card);
+            }
+            else{
+              parent.insertBefore(card, parent.firstChild);
+            }
 
-  colorWheel = drawDotOnColorWheel(rgbColor,colorWheel,size);
-
-  function colorWheelMouse(evt) {
-      var ctx = colorWheel.getContext("2d");
-      var data = ctx.getImageData(evt.offsetX, evt.offsetY, 1, 1);
-      var rgb = 'rgb(' + data.data.slice(0, 3).join(',') + ')';
-      injectColorCard(rgbToHex(rgb),rgb);
-  }
-
-  colorWheel.onclick = colorWheelMouse;
-  colorWheel.setAttribute('id','color-search-color-wheel');
-
-  document.getElementById('color-search-color-wheel').replaceWith(colorWheel);
-
-}
-
-
-//--------------------- COLOR WHEEL --------------------
-
-// https://stackoverflow.com/a/46217884/7852784
-
-function degreesToRadians(degrees) {
-    return degrees * (Math.PI / 180);
-}
-
-function generateColorWheel(size, centerColor) {
-    if (size === void 0) { size = 400; }
-    if (centerColor === void 0) { centerColor = "white"; }
-    //Generate main canvas to return
-    var canvas = document.createElement("canvas");
-    canvas.classList.add('color-search-color-wheel')
-    var ctx = canvas.getContext("2d");
-    canvas.width = canvas.height = size;
-    //Generate canvas clone to draw increments on
-    var canvasClone = document.createElement("canvas");
-    canvasClone.width = canvasClone.height = size;
-    var canvasCloneCtx = canvasClone.getContext("2d");
-    //Initiate variables
-    var angle = 0;
-    var hexCode = [255, 0, 0];
-    var pivotPointer = 0;
-    var colorOffsetByDegree = 4.322;
-    //For each degree in circle, perform operation
-    while (angle++ < 360) {
-        //find index immediately before and after our pivot
-        var pivotPointerbefore = (pivotPointer + 3 - 1) % 3;
-        var pivotPointerAfter = (pivotPointer + 3 + 1) % 3;
-        //Modify colors
-        if (hexCode[pivotPointer] < 255) {
-            //If main points isn't full, add to main pointer
-            hexCode[pivotPointer] = (hexCode[pivotPointer] + colorOffsetByDegree > 255 ? 255 : hexCode[pivotPointer] + colorOffsetByDegree);
+            break;
+          }
         }
-        else if (hexCode[pivotPointerbefore] > 0) {
-            //If color before main isn't zero, subtract
-            hexCode[pivotPointerbefore] = (hexCode[pivotPointerbefore] > colorOffsetByDegree ? hexCode[pivotPointerbefore] - colorOffsetByDegree : 0);
-        }
-        else if (hexCode[pivotPointer] >= 255) {
-            //If main color is full, move pivot
-            hexCode[pivotPointer] = 255;
-            pivotPointer = (pivotPointer + 1) % 3;
-        }
-        //clear clone
-        canvasCloneCtx.clearRect(0, 0, size, size);
-        //Generate gradient and set as fillstyle
-        var grad = canvasCloneCtx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-        grad.addColorStop(0, centerColor);
-        grad.addColorStop(1, "rgb(" + hexCode.map(function (h) { return Math.floor(h); }).join(",") + ")");
-        canvasCloneCtx.fillStyle = grad;
-        //draw full circle with new gradient
-        canvasCloneCtx.globalCompositeOperation = "source-over";
-        canvasCloneCtx.beginPath();
-        canvasCloneCtx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-        canvasCloneCtx.closePath();
-        canvasCloneCtx.fill();
-        //Switch to "Erase mode"
-        canvasCloneCtx.globalCompositeOperation = "destination-out";
-        //Carve out the piece of the circle we need for this angle
-        canvasCloneCtx.beginPath();
-        canvasCloneCtx.arc(size / 2, size / 2, 0, degreesToRadians(angle + 1), degreesToRadians(angle + 1));
-        canvasCloneCtx.arc(size / 2, size / 2, size / 2 + 1, degreesToRadians(angle + 1), degreesToRadians(angle + 1));
-        canvasCloneCtx.arc(size / 2, size / 2, size / 2 + 1, degreesToRadians(angle + 1), degreesToRadians(angle - 1));
-        canvasCloneCtx.arc(size / 2, size / 2, 0, degreesToRadians(angle + 1), degreesToRadians(angle - 1));
-        canvasCloneCtx.closePath();
-        canvasCloneCtx.fill();
-        //Draw carved-put piece on main canvas
-        ctx.drawImage(canvasClone, 0, 0);
-    }
-    //return main canvas
-    return canvas;
-}
+      });
 
-function drawDotOnColorWheel(rgbColor, colorWheel,size){
+  if(colorName==''){
 
-  var context = colorWheel.getContext('2d');
+      // Create card
+      var templateData = {
+        hex: hexColor,
+        rgb: rgbColor,
+        textColor: btnTextColor,
+        name: ' '
+      };
+      var card = createCard(templateData);
 
-  for(var x=0;x<size;x++){
-    for(var y=0;y<size;y++){
-      var data = context.getImageData(x, y, 1, 1);
-      // If the pixel matches the color, then draw the dot
-      var pixelColor = 'rgb(' + data.data.slice(0, 3).join(',') + ')';
-      if(pixelColor === rgbColor){
-        context.beginPath();
-        context.arc(x, y, 5, 0, 2 * Math.PI, false);
-        context.fillStyle = 'white';
-        context.fill();
-        return colorWheel;
+      // Add card to the DOM
+      var parent = document.getElementsByClassName('bkWMgd')[0].parentElement;
+      if(document.getElementsByClassName('color-search-card')[0]){
+        document.getElementsByClassName('color-search-card')[0].replaceWith(card);
       }
-    }
+      else{
+        parent.insertBefore(card, parent.firstChild);
+      }
   }
-
-  return colorWheel;
 
 }

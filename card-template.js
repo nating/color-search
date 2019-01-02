@@ -22,13 +22,13 @@ const cardTemplate = (data) => `
   <div class="color-search-card" style="color:${data.textColor};">
     <div class="color-search-color-info" style="background-color:${data.hex};">
       <div>
-        <h3><span id="color-search-hex">${data.hex}</span><span onclick="copy('${data.hex}');" class="paperclip icon"></span></h3>
+        <h3><span id="color-search-hex" onclick="copy('${data.hex}');">${data.hex}</span></h3>
       </div>
       <div>
-        <h3><span id="color-search-rgb">${data.rgb}</span><span onclick="copy('${data.rgb}');" class="paperclip icon"></span></h3>
+        <h3><span id="color-search-rgb" onclick="copy('${data.rgb}');">${data.rgb}</span></h3>
       </div>
       <div>
-        <h3><span id="color-search-name">${data.name}</span><span onclick="copy('${data.name}');" class="paperclip icon"></span></h3>
+        <h3><span id="color-search-name" onclick="copy('${data.name}');">${data.name}</span></h3>
       </div>
     </div>
     <div id="color-search-color-wheel" onclick="console.log('wheel clicked')" class="color-search-color-wheel">.

@@ -4,7 +4,7 @@
   border: none;
   padding:10px;
   margin-bottom:20px;
-  height:200px;
+  height:150px;
 }
 
 .color-search-color-info {
@@ -14,50 +14,10 @@
   justify-content:space-around;
   height:100%;
   text-align:center;
-  width:50%;
+  width:100%;
   border-radius: 15px;
 }
 
-.color-search-color-wheel {
-  float: right;
-}
-
-.paperclip.icon {
-  position: absolute;
-  margin-left: 9px;
-  margin-top: 2px;
-  width: 6px;
-  height: 12px;
-  border-radius: 4px 4px 0 0;
-  border-left: solid 1px currentColor;
-  border-right: solid 1px currentColor;
-  border-top: solid 1px currentColor;
-  -webkit-transform: rotate(45deg);
-          transform: rotate(45deg);
-  margin-left:20px;
-  cursor:pointer;
-}
-.paperclip.icon:before {
-  content: '';
-  position: absolute;
-  top: 11px;
-  left: -1px;
-  width: 4px;
-  height: 6px;
-  border-radius: 0 0 3px 3px;
-  border-left: solid 1px currentColor;
-  border-right: solid 1px currentColor;
-  border-bottom: solid 1px currentColor;
-}
-.paperclip.icon:after {
-  content: '';
-  position: absolute;
-  left: 1px;
-  top: 1px;
-  width: 2px;
-  height: 10px;
-  border-radius: 4px 4px 0 0;
-  border-left: solid 1px currentColor;
-  border-right: solid 1px currentColor;
-  border-top: solid 1px currentColor;
+#color-search-hex, #color-search-rgb, #color-search-name {
+  cursor: copy;
 }
