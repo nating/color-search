@@ -1,14 +1,14 @@
 {
     "manifest_version": 2,
     "name": "Color Search",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "description": "Adds Color cards to the top of color search results.",
     "author": "Geoffrey Natin",
     "icons": {
-        "16": "icon16.png",
-        "32": "icon32.png",
-        "48": "icon48.png",
-        "128": "icon128.png"
+        "16": "images/icon16.png",
+        "32": "images/icon32.png",
+        "48": "images/icon48.png",
+        "128": "images/icon128.png"
     },
     "web_accessible_resources": [
         "colornames.json"
